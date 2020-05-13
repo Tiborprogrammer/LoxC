@@ -67,13 +67,6 @@ void runFile(const char * path) {
 
 
 int main(int argc, const char* argv[]) {
-    int constant = vm.chunk->addConstant(5);
-    vm.chunk->writeChunk(OpCode::OP_CONSTANT, 0);
-    vm.chunk->writeChunk(constant, 0);
-    vm.chunk->writeChunk(OpCode::OP_RETURN, 1);
-    vm.run();
-
-    /*
     if (argc == 1) {
         repl();
     } else if (argc == 2) {
@@ -82,7 +75,5 @@ int main(int argc, const char* argv[]) {
         fprintf(stderr, "Usage: clox [path]\n");
         exit(64);
     }
-    */
-    vm.freeVM();
     return 0;
 }

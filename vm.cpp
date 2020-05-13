@@ -1,7 +1,7 @@
 #include "common.h"
 #include <cstdio>
 #include "debug.h"
-#include "compiler.cpp"
+#include "compiler.h"
 
 class VM {
 public:
