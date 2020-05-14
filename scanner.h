@@ -60,6 +60,7 @@ public:
     Token identifier();
     TokenType identifierType() const;
     TokenType checkKeyword(int startPos, int length, const char* rest, TokenType type) const;
+    bool multiLineComment();
 };
 
 #endif

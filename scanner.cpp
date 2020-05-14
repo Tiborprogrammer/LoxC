@@ -1,4 +1,7 @@
 #include "scanner.h"
+#include <iostream>
+
+using namespace std;
 
 void Scanner::initScanner(const char* source) {
     start = source;
@@ -17,6 +20,12 @@ bool Scanner::isDigit(char c) {
 }
 
 Token Scanner::scanToken() {
+    if (peek() == '/' && peekNext() == '*') {
+        if (!multiLineComment()) {
+            return errorToken("Are you that lazy that you can't even terminate a multi line comment");
+        }
+    }
+
     skipWhitespace();
 
     start = current;
@@ -38,7 +47,8 @@ Token Scanner::scanToken() {
         case '.': return makeToken(TokenType::TOKEN_DOT);
         case '-': return makeToken(TokenType::TOKEN_MINUS);
         case '+': return makeToken(TokenType::TOKEN_PLUS);
-        case '/': return makeToken(TokenType::TOKEN_SLASH);
+        case '/':
+            return makeToken(TokenType::TOKEN_SLASH);
         case '*': return makeToken(TokenType::TOKEN_STAR);
         case '!':
             return makeToken(match('=') ? TokenType::TOKEN_BANG_EQUAL : TokenType::TOKEN_BANG);
@@ -119,6 +129,28 @@ void Scanner::skipWhitespace() {
                 return;
         }
     }
+}
+
+bool Scanner::multiLineComment() {
+    char c = '*';
+    // While we still have at least 2 more chars in front of us
+    while ('\0' != *(current + 1) && !isAtEnd()) {
+        // If the next char is a new line, increment the line counter
+        if (c == '\n') line++;
+
+        // If we found the end of the comment
+        if (peek() == '*' && peekNext() == '/') {
+            // Advance two times for '*' and '/'
+            advance();
+            advance();
+            // Exit the function
+            return true;
+        }
+        // Advance to the next char
+        c = advance();
+    }
+    advance();
+    return false;
 }
 
 TokenType Scanner::checkKeyword(int startPos, int length, const char* rest, TokenType type) const {
