@@ -9,14 +9,14 @@ public:
     int ip;
     vector<Value> stack;
     Compiler compiler = Compiler();
+    Scanner scanner;
 
     VM() {
         chunk = new Chunk();
         resetStack();
     }
 
-    void freeVM() {
-    }
+    void freeVM() {}
 
     void resetStack() {
         stack.clear();
@@ -80,7 +80,16 @@ public:
     }
 
     InterpretResult interpret(const char* source) {
-        compiler.compile(source);
-        return INTERPRET_OK;
+        if (!compile(source, chunk)) {
+            chunk->freeChunk();
+            return INTERPRET_COMPILE_ERROR;
+        }
+
+        ip = 0;
+
+        InterpretResult result = run();
+
+        chunk->freeChunk();
+        return result;
     }
 };
