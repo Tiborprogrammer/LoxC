@@ -31,10 +31,20 @@ int Debug::disassembleInstruction(Chunk* chunk, int index) {
         printf("%4d ", chunk->lines[index]);
     }
 
-    uint8_t instruction = chunk->code[index];
+    uint8_t instruction = chunk->code.at(index);
     switch (instruction) {
         case OP_CONSTANT:
             return constantInstruction("OP_CONSTANT", chunk, index);
+        case OP_MODULUS:
+            return simpleInstruction("OP_MODULUS", index);
+        case OP_NOT:
+            return simpleInstruction("OP_NOT", index);
+        case OP_NIL:
+            return simpleInstruction("OP_NIL", index);
+        case OP_TRUE:
+            return simpleInstruction("OP_TRUE", index);
+        case OP_FALSE:
+            return simpleInstruction("OP_FALSE", index);
         case OP_ADD:
             return simpleInstruction("OP_ADD", index);
         case OP_SUBTRACT:
@@ -47,6 +57,8 @@ int Debug::disassembleInstruction(Chunk* chunk, int index) {
             return simpleInstruction("OP_NEGATE", index);
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", index);
+        case OP_POWER:
+            return simpleInstruction("OP_POWER", index);
         default:
             printf("Unknown opcode %d\n", instruction);
             return index + 1;

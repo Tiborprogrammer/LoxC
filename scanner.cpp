@@ -47,9 +47,11 @@ Token Scanner::scanToken() {
         case '.': return makeToken(TokenType::TOKEN_DOT);
         case '-': return makeToken(TokenType::TOKEN_MINUS);
         case '+': return makeToken(TokenType::TOKEN_PLUS);
+        case '%': return makeToken(TokenType::TOKEN_MODULUS);
         case '/':
             return makeToken(TokenType::TOKEN_SLASH);
-        case '*': return makeToken(TokenType::TOKEN_STAR);
+        case '*':
+            return makeToken(match('*') ? TokenType::TOKEN_STAR_STAR : TokenType::TOKEN_STAR);
         case '!':
             return makeToken(match('=') ? TokenType::TOKEN_BANG_EQUAL : TokenType::TOKEN_BANG);
         case '=':

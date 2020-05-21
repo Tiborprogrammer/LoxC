@@ -15,6 +15,7 @@ typedef enum {
     PREC_COMPARISON,  // < > <= >=
     PREC_TERM,        // + -
     PREC_FACTOR,      // * /
+    PREC_POWER,       // **
     PREC_UNARY,       // ! -
     PREC_CALL,        // . ()
     PREC_PRIMARY
@@ -48,6 +49,7 @@ void binary();
 void errorAtCurrent(const char* message);
 void error(const char* message);
 void errorAt(Token* token, const char* message);
+void literal();
 
 typedef void(*ParseFn)();
 
@@ -59,7 +61,7 @@ typedef struct {
 
 ParseRule* getRule(TokenType type);
 
-extern ParseRule rules[40];
+extern ParseRule rules[42];
 
 
 #endif   

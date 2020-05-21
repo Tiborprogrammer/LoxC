@@ -17,7 +17,7 @@ ParseRule rules[] = {
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_SEMICOLON
         {nullptr,  binary,  PREC_FACTOR},     // TOKEN_SLASH
         {nullptr,  binary,  PREC_FACTOR},     // TOKEN_STAR
-        {nullptr,  nullptr, PREC_NONE},       // TOKEN_BANG
+        { unary,    NULL,    PREC_NONE },       // TOKEN_BANG
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_BANG_EQUAL
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_EQUAL
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_EQUAL_EQUAL
@@ -25,23 +25,25 @@ ParseRule rules[] = {
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_GREATER_EQUAL
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_LESS
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_LESS_EQUAL
+        {nullptr, binary, PREC_POWER},              // TOKEN_STAR_STAR
+        {nullptr, binary, PREC_FACTOR},       // TOKEN_MODULUS
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_IDENTIFIER
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_STRING
         {number,   nullptr, PREC_NONE},       // TOKEN_NUMBER
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_AND
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_CLASS
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_ELSE
-        {nullptr,  nullptr, PREC_NONE},       // TOKEN_FALSE
+        { literal,  NULL,    PREC_NONE },       // TOKEN_FALSE
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_FOR
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_FUN
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_IF
-        {nullptr,  nullptr, PREC_NONE},       // TOKEN_NIL
+        { literal,  NULL,    PREC_NONE },       // TOKEN_NIL
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_OR
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_PRINT
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_RETURN
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_SUPER
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_THIS
-        {nullptr,  nullptr, PREC_NONE},       // TOKEN_TRUE
+        { literal,  NULL,    PREC_NONE },     // TOKEN_TRUE
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_VAR
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_WHILE
         {nullptr,  nullptr, PREC_NONE},       // TOKEN_ERROR
@@ -137,6 +139,18 @@ void binary() {
         case TOKEN_MINUS:         emitByte(OP_SUBTRACT); break;
         case TOKEN_STAR:          emitByte(OP_MULTIPLY); break;
         case TOKEN_SLASH:         emitByte(OP_DIVIDE); break;
+        case TOKEN_STAR_STAR:     emitByte(OP_POWER); break;
+        case TOKEN_MODULUS:       emitByte(OP_MODULUS); break;
+        default:
+            return; // Unreachable.
+    }
+}
+
+void literal() {
+    switch (compiler.parser.previous.type) {
+        case TOKEN_FALSE: emitByte(OP_FALSE); break;
+        case TOKEN_NIL: emitByte(OP_NIL); break;
+        case TOKEN_TRUE: emitByte(OP_TRUE); break;
         default:
             return; // Unreachable.
     }
@@ -149,7 +163,7 @@ void grouping() {
 
 void number() {
     double value = strtod(compiler.parser.previous.start, nullptr);
-    emitConstant(value);
+    emitConstant(NUMBER_VAL(value));
 }
 
 void unary() {
@@ -161,6 +175,7 @@ void unary() {
     // Emit the operator instruction.
     switch (operatorType) {
         case TOKEN_MINUS: emitByte(OP_NEGATE); break;
+        case TOKEN_BANG: emitByte(OP_NOT); break;
         default:
             return; // Unreachable.
     }
